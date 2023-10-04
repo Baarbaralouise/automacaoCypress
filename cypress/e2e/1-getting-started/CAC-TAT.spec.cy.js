@@ -80,7 +80,7 @@ describe('Central de Atendimento ao Cliente TAT', function () {
             .should('have.value', 'barbaralouise@teste.com')
 
         cy.get('#phone-checkbox')
-            .click()
+            .check()
 
         cy.get('#open-text-area')
             .type('Teste')
@@ -135,17 +135,74 @@ describe('Central de Atendimento ao Cliente TAT', function () {
             .select('YouTube')
             .should('have.value', 'youtube')
     })
-    
+
     it('Deve selecionar um produto (Mentoria) por seu valor (value)', function () {
         cy.get('#product')
             .select('mentoria')
             .should('have.value', 'mentoria')
     })
-    
+
     it('Deve selecionar um produto (Blog) por seu índice', function () {
         cy.get('#product').select(1)
-        .should('have.value', 'blog')
+            .should('have.value', 'blog')
 
     })
+
+    it('Deve marcar o tipo de atendimento "Feedback"', function () {
+        cy.get('input[type="radio"][value="feedback"]')
+            .check()
+            .should('have.value', 'feedback')
+    })
+
+    it('Deve marcar cada tipo de atendimento', function () {
+        cy.get('input[type="radio"]')
+            .should('have.length', 3)
+            .each(function ($radio) {
+                cy.wrap($radio).check()
+                cy.wrap($radio).should('be.checked')
+            })
+    })
+
+    it('Deve marcar ambos checkboxes, depois desmarca o último', function () {
+        cy.get('input[type="checkbox"]')
+            .check()
+            .should('be.checked')
+            .last()
+            .uncheck()
+            .should('not.be.checked')
+
+    })
+
+    it('Deve selecionar um arquivo da pasta fixtures', function () {
+        cy.get('input[type="file"]#file-upload') //pegou o elemento
+            .should('not.have.value')    //verificou que ainda não tinha valor 
+            .selectFile('cypress/fixtures/example.json')  //upload de arquivo passando o caminho relativo do arquivo 
+            .should(function ($input) { //should recebendo uma função de callback, e a função de callback recebendo o próprio elemento que foi passado no get
+                expect($input[0].files[0].name).to.equal('example.json') //verificou se o arquivo do upload é igual ao que está mostrando
+
+            })
+    })
+
+    it('Deve selecionar um arquivo simulando um drag-and-drop', function () {
+        cy.get('input[type="file"]#file-upload') //pegou o elemento
+            .should('not.have.value')    //verificou que ainda não tinha valor 
+            .selectFile('cypress/fixtures/example.json', { action: 'drag-drop' })  //upload de arquivo passando o caminho relativo do arquivo 
+            .should(function ($input) { //should recebendo uma função de callback, e a função de callback recebendo o próprio elemento que foi passado no get
+                expect($input[0].files[0].name).to.equal('example.json') //verificou se o arquivo do upload é igual ao que está mostrando
+
+            })
+    })
+
+    it('Deve selecionar um arquivo utilizando uma fixture para a qual foi dada um alias', () => {
+        cy.fixture('example.json').as('sampleFile')
+        cy.get('input[type="file"]#file-upload')
+            .selectFile('@sampleFile', { action: 'drag-drop' })
+            .should(function ($input) { 
+                expect($input[0].files[0].name).to.equal('example.json') 
+
+            })
+    })
+
+
 
 })
