@@ -2,6 +2,8 @@
 
 describe('Central de Atendimento ao Cliente TAT', function () {
 
+    const tresMiliSegundos = 3000
+
     beforeEach(() => {
         cy.visit('./src/index.html') //Visitar alguma URL local ou externa
     })
@@ -12,6 +14,8 @@ describe('Central de Atendimento ao Cliente TAT', function () {
 
     it('Deve verificar se os campos obrigatórios estão preenchidos', function () {
         const longText = 'Teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste, teste'
+
+        cy.clock()
 
         cy.get('#firstName')
             .should('be.visible')
@@ -33,9 +37,15 @@ describe('Central de Atendimento ao Cliente TAT', function () {
 
         cy.get('.success')
             .should('be.visible')
+
+        cy.tick(tresMiliSegundos)
+
+        cy.get('.success')
+            .should('not.be.visible')
     })
 
     it('Deve exibir mensagem de erro ao submeter o formulário com um email com formatação inválida', function () {
+        cy.clock()
         cy.get('#firstName')
             .should('be.visible')
             .type('Bárbara')
@@ -56,6 +66,12 @@ describe('Central de Atendimento ao Cliente TAT', function () {
 
         cy.get('.error')
             .should('be.visible')
+        
+        cy.tick(tresMiliSegundos)
+
+        cy.get('.error')
+        .should('not.be.visible')
+
     })
 
     it('Campo de telefone fica vazio ao preencher com valor não-numérico', function () {
@@ -119,15 +135,22 @@ describe('Central de Atendimento ao Cliente TAT', function () {
     })
 
     it('Deve exibir mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', function () {
+        cy.clock()
         cy.contains('button', 'Enviar').click()
         cy.get('.error')
             .should('be.visible')
+        cy.tick(tresMiliSegundos)
+        cy.get('.error')
+            .should('not.be.visible')
     })
 
     it('Deve enviar o formuário com sucesso usando um comando customizado', function () {
+        cy.clock()
         cy.fillMandatoryFieldsAndSubmit()
 
         cy.get('.success').should('be.visible')
+        cy.tick(tresMiliSegundos)
+        cy.get('.success').should('not.be.visible')
     })
 
     it('Deve selecionar um produto (YouTube) por seu texto', function () {
@@ -197,24 +220,24 @@ describe('Central de Atendimento ao Cliente TAT', function () {
         cy.fixture('example.json').as('sampleFile')
         cy.get('input[type="file"]#file-upload')
             .selectFile('@sampleFile', { action: 'drag-drop' })
-            .should(function ($input) { 
-                expect($input[0].files[0].name).to.equal('example.json') 
+            .should(function ($input) {
+                expect($input[0].files[0].name).to.equal('example.json')
 
             })
     })
 
-    it('Deve verificar que a política de privacidade abre em outra aba sem a necessidade de um clique', function() {
+    it('Deve verificar que a política de privacidade abre em outra aba sem a necessidade de um clique', function () {
         cy.get('#privacy a')
             .should('have.attr', 'target', '_blank')
     })
-    
-    it('Deve acessar a página da política de privacidade removendo o target e então clicando no link', function() {
+
+    it('Deve acessar a página da política de privacidade removendo o target e então clicando no link', function () {
         cy.get('#privacy a')
             .invoke('removeAttr', 'target') // Remover o target para abrir a política de privacidade na mesma aba 
             .click()
 
         cy.contains('CAC TAT - Política de privacidade').should('be.visible')
-    })  
+    })
 
 
 
