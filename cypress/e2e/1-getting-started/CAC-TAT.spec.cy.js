@@ -66,11 +66,11 @@ describe('Central de Atendimento ao Cliente TAT', function () {
 
         cy.get('.error')
             .should('be.visible')
-        
+
         cy.tick(tresMiliSegundos)
 
         cy.get('.error')
-        .should('not.be.visible')
+            .should('not.be.visible')
 
     })
 
@@ -239,7 +239,22 @@ describe('Central de Atendimento ao Cliente TAT', function () {
         cy.contains('CAC TAT - Política de privacidade').should('be.visible')
     })
 
-
+    it('Deve exibir e esconde as mensagens de sucesso e erro usando o .invoke', () => {
+        cy.get('.success')
+            .should('not.be.visible')
+            .invoke('show')
+            .should('be.visible')
+            .and('contain', 'Mensagem enviada com sucesso.')
+            .invoke('hide')
+            .should('not.be.visible')
+        cy.get('.error')
+            .should('not.be.visible')
+            .invoke('show')
+            .should('be.visible')
+            .and('contain', 'Valide os campos obrigatórios!')
+            .invoke('hide')
+            .should('not.be.visible')
+    })
 
 
 })
